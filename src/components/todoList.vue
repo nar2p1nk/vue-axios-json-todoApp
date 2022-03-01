@@ -9,7 +9,12 @@
             placeholder="Add a new todo"
         />
         <ul>
-            <li v-for='todo of todos' :key='todo.id'>
+            <li
+                v-for='todo of todos'
+                :class="{done:todo.done}"
+                :key='todo.id'
+                @click='doneTodo(todo.id)'
+            >
                 {{todo.name}}
             </li>
         </ul>
@@ -43,7 +48,20 @@ export default {
                 const res = await axios.post(baseURL,{name:this.todoName})
 
                 this.todos = [...this.todos,res.data];
+                console.log(this.todos)
                 this.todoName = '';
+            }catch(e){console.error(e)}
+        },
+        async doneTodo(id){
+            try{
+                await axios.patch(`${baseURL}/${id}`,{
+                    done:true
+                });
+
+                this.todos = this.todos.map(todo =>{
+                    if(todo.id === id){todo.done = true;}
+                    return todo
+                })
             }catch(e){console.error(e)}
         }
     }
@@ -57,6 +75,7 @@ h1{
 
 li{
     color:white;
+    cursor: pointer;
 }
 
 
@@ -67,6 +86,10 @@ input {
   border: 1px solid #fd9644;
   margin-bottom: 2rem;
   font-size: 1.5rem;
+}
+
+.done {
+    text-decoration: line-through;
 }
 
 </style>
